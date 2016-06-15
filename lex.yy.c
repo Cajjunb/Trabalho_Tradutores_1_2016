@@ -665,12 +665,12 @@ YY_RULE_SETUP
 case 7:
 YY_RULE_SETUP
 #line 12 "lexico.l"
-{yylval.cadeia=  strdup(yytext);return ID;}
+{yylval.cadeia=  strdup(yytext);return IDENTIFICADOR;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 13 "lexico.l"
-{return NUM;}
+{return NUMERO;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP

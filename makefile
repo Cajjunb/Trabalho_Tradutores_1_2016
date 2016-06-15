@@ -10,8 +10,13 @@ CFLAGS =
 
 OBJS = main.o util.o scan.o parse.o symtab.o analyze.o code.o cgen.o
 
+OBJ = gcminus.o util.o scan.o parse.o symtab.o analyze.o code.o cgen.o
+
 tiny.exe: $(OBJS)
 	$(CC) $(CFLAGS)  $(OBJS) -o tiny
+
+gerador: $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o gcminus
 
 main.o: main.c globals.h util.h scan.h parse.h analyze.h cgen.h
 	$(CC) $(CFLAGS) -c main.c
@@ -37,24 +42,33 @@ code.o: code.c code.h globals.h
 cgen.o: cgen.c globals.h symtab.h code.h cgen.h
 	$(CC) $(CFLAGS) -c cgen.c
 
+gcminus.o: flex bison 
+	$(CC) -c lex.yy.c -o gcminus.o
+
+flex:
+	flex lexico.l
+
+bison:
+	bison sintatico.y
+
 clean:
-	-del tiny.exe
-	-del tm.exe
+	 tiny.exe
+	 tm.exe
 	-del main.o
-	-del util.o
-	-del scan.o
-	-del parse.o
-	-del symtab.o
-	-del analyze.o
-	-del cgen.o
-	-del tm.o
+	 util.o
+	 scan.o
+	 parse.o
+	 symtab.o
+	 analyze.o
+	 code.o
+	 cgen.o
+	tm.o
 
 tm.exe: tm.c
-	$(CC) $(CFLAGS) tm.c -o tm
+	$C) $(CFLAGS) tm.c -o tm
 
 tiny: tiny.exe
 
 tm: tm.exe
 
 all: tiny tm
-

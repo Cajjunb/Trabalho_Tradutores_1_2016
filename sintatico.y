@@ -2,18 +2,23 @@
 /* considerando notacao polonesa para expressoes */
 %{
 #include <stdio.h> 
+#include <string.h> 
 #include "tabela.c"
+#include "globals.h"
+#include "code.h"
+
 %}
 
 %union {
 char *cadeia;
+int val;
 }
 
 %token INICIO
 %token FIM
 %token WHILE
-%token NUM
-%token ID
+%token NUMERO
+%token IDENTIFICADOR
 %token ATRIB
 %token REL
 %token OP
@@ -23,7 +28,8 @@ char *cadeia;
 %token OUTPUT
 
 
-%type<cadeia> ID 
+%type<cadeia> IDENTIFICADOR 
+%type<val> NUMERO 
 
 %%
 /* Regras definindo a GLC e acoes correspondentes */
@@ -35,7 +41,7 @@ programa:	 declarationList INICIO statementlist FIM 			{;}
 declarationList: declarationList declaration | declaration 		{/*debug*//*printf("DeclarationList\n")*/;}
 ;
 
-declaration: typeSpecifier ID ';' 								{/*debug*//*printf("Declaracao de ID - %s\n",$2)*/;atualizaTabela( &tabeladeSimbolos, $2, 'd', "int");}
+declaration: typeSpecifier IDENTIFICADOR ';' 								{/*debug*//*printf("Declaracao de IDENTIFICADOR - %s\n",$2)*/;atualizaTabela( &tabeladeSimbolos, $2, 'd', "int");}
 ;
 
 typeSpecifier: INT | VOID 										{/*debug*//*printf("tipo\n")*/;}
@@ -50,12 +56,11 @@ iterationStatement: WHILE '(' expression ')' statement 			{;}
 
 ;
 
-statement:		ID ATRIB expression								{/*debug*//*printf("Utilizacao de ID %s\n", $1)*/;if(!atualizaUso(&tabeladeSimbolos, $1)){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);}}
+statement:		IDENTIFICADOR ATRIB expression								{/*debug*//*printf("Utilizacao de IDENTIFICADOR %s\n", $1)*/;if(!atualizaUso(&tabeladeSimbolos, $1)){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);}}
 				| imprime										{;}
 ;
 
-imprime:	OUTPUT ID 											{printf("\timprimindo variavel\n");}
-		|	OUTPUT NUM 											{printf("\timprimindo constante\n");}
+imprime:	OUTPUT expression 											{emitRO("OUT",ac,0,0,"write ac");}
 
 ;
 
@@ -63,19 +68,35 @@ expression:	expression REL aritexpression    					{/*debug*//*printf("expression
 		| aritexpression										{/*debug*//*printf("atritexpression\n")*/;}
 ;
 
-aritexpression:     NUM 										{/*debug*//*printf("Numero!\n")*/;}
-        | ID 													{/*debug*//*printf("Utilizacao de ID - %s\n",$1)*/;if(!atualizaUso(&tabeladeSimbolos, $1)){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);}}
+aritexpression:     NUMERO 										{emitRM("LDC",ac,$0,0,"load const");/*debug*//*printf("Numero!\n")*/;}
+        | IDENTIFICADOR 													{/*debug*//*printf("Utilizacao de IDENTIFICADOR - %s\n",$1)*/;if(!atualizaUso(&tabeladeSimbolos, $1)){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);}}
         | aritexpression OP aritexpression 						{/*debug*//*printf("atrib expr atrib\n")*/;}
 ;
 
 %%
 extern FILE *yyin;
+
+/* allocate global variables */
+int lineno = 0;
+FILE * source;
+FILE * listing;
+FILE * code;
+
+/* allocate and set tracing flags */
+int EchoSource = FALSE;
+int TraceScan = FALSE;
+int TraceParse = FALSE;
+int TraceAnalyze = FALSE;
+int TraceCode = FALSE;
+
+int Error = FALSE;
 int main (int argc, char*argv[]) {
 	int erroSintatico;
 
 
 	printf("\tLendo o arquivo %s\n", argv[1]);
-	yyin = fopen(argv[1], "r");
+	yyin  = fopen(argv[1], "r");
+	yyout = fopen(strcat(argv[1], ".tm"), "w");
 
 	if(yyin){
 		//emitComment("Standard prelude:");
@@ -84,9 +105,11 @@ int main (int argc, char*argv[]) {
 		//emitComment("End of standard prelude.");
 
 		//emitComment("End of execution.");
-		emitRO("HALT",0,0,0,"");
+		
 
 		erroSintatico = yyparse ();
+		emitRO("HALT",0,0,0,"");
+
 		if(erroSintatico == 0)
 			printf("\tPrograma sintaticamente correto!\n");
 		//Verificiando se algum simbolo nao foi usado
