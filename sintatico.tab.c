@@ -71,6 +71,7 @@
 #line 3 "sintatico.y"
 
 #include <stdio.h> 
+#include <stdlib.h> 
 #include <string.h> 
 #include "tabela.c"
 #include "globals.h"
@@ -79,7 +80,7 @@
 
 
 /* Line 189 of yacc.c  */
-#line 83 "sintatico.tab.c"
+#line 84 "sintatico.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -127,15 +128,15 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 12 "sintatico.y"
+#line 13 "sintatico.y"
 
-char *cadeia;
-int val;
+	char *cadeia;
+	int  val;
 
 
 
 /* Line 214 of yacc.c  */
-#line 139 "sintatico.tab.c"
+#line 140 "sintatico.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -147,7 +148,7 @@ int val;
 
 
 /* Line 264 of yacc.c  */
-#line 151 "sintatico.tab.c"
+#line 152 "sintatico.tab.c"
 
 #ifdef short
 # undef short
@@ -435,8 +436,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    38,    38,    41,    41,    44,    47,    47,    50,    51,
-      52,    55,    59,    60,    63,    67,    68,    71,    72,    73
+       0,    39,    39,    42,    42,    47,    52,    52,    57,    60,
+      63,    68,    72,    79,    84,    88,    91,    96,   101,   107
 };
 #endif
 
@@ -1355,119 +1356,154 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 38 "sintatico.y"
-    {;;}
+#line 39 "sintatico.y"
+    {printf("\tFIM do parser\n");;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 41 "sintatico.y"
-    {/*debug*//*printf("DeclarationList\n")*/;;}
+#line 42 "sintatico.y"
+    {	
+																	printf("\tDeclarationList\n");
+																;}
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 44 "sintatico.y"
-    {/*debug*//*printf("Declaracao de IDENTIFICADOR - %s\n",$2)*/;atualizaTabela( &tabeladeSimbolos, (yyvsp[(2) - (3)].cadeia), 'd', "int");;}
+#line 47 "sintatico.y"
+    {
+																	printf("\tDeclaracao de IDENTIFICADOR - %s\n",(yyvsp[(2) - (3)].cadeia));
+																	atualizaTabela( &tabeladeSimbolos, (yyvsp[(2) - (3)].cadeia), 'd', "int");;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 47 "sintatico.y"
-    {/*debug*//*printf("tipo\n")*/;;}
+#line 52 "sintatico.y"
+    {
+																	printf("\ttipo\n");
+																;}
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 50 "sintatico.y"
-    {/*debug*//*printf("statement\n")*/;;}
+#line 57 "sintatico.y"
+    {
+																	printf("\tstatement\n");
+																;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 51 "sintatico.y"
-    {/*debug*//*printf("iteration!\n")*/;;}
+#line 60 "sintatico.y"
+    {
+																	printf("\titeration!\n");
+																;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 52 "sintatico.y"
-    {/*debug*//*printf("statementlist\n")*/;;}
+#line 63 "sintatico.y"
+    {
+																	printf("\tstatementlist\n");
+																;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 55 "sintatico.y"
+#line 68 "sintatico.y"
     {;;}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 59 "sintatico.y"
-    {/*debug*//*printf("Utilizacao de IDENTIFICADOR %s\n", $1)*/;if(!atualizaUso(&tabeladeSimbolos, (yyvsp[(1) - (3)].cadeia))){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",(yyvsp[(1) - (3)].cadeia));};}
+#line 72 "sintatico.y"
+    {	
+																	printf("\tUtilizacao de IDENTIFICADOR %s\n", (yyvsp[(1) - (3)].cadeia));
+																	if(!atualizaUso(&tabeladeSimbolos, (yyvsp[(1) - (3)].cadeia))){
+																		erroSemantico++;
+																		printf("\tERRO: %s nao foi declarado\n",(yyvsp[(1) - (3)].cadeia));
+																	}
+																;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 60 "sintatico.y"
-    {;;}
+#line 79 "sintatico.y"
+    {
+																	printf("\tIMPRIME\n");
+																;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 63 "sintatico.y"
+#line 84 "sintatico.y"
     {emitRO("OUT",ac,0,0,"write ac");;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 67 "sintatico.y"
-    {/*debug*//*printf("expressionRELatritexpression")*/;;}
+#line 88 "sintatico.y"
+    {
+																	printf("expressionRELatritexpression");
+																;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 68 "sintatico.y"
-    {/*debug*//*printf("atritexpression\n")*/;;}
+#line 91 "sintatico.y"
+    {
+																	printf("\tatritexpression\n");
+																;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 71 "sintatico.y"
-    {emitRM("LDC",ac,(yyvsp[(1) - (1)].val),0,"load const");/*debug*//*printf("Numero!\n")*/;;}
+#line 96 "sintatico.y"
+    {
+																	printf("\tNumero = %d \n",(yyvsp[(1) - (1)].val));
+																	emitRM("LDC",ac, (yyvsp[(1) - (1)].val),0,"load const");
+																	printf("\tNumero!\n");
+																;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 72 "sintatico.y"
-    {/*debug*//*printf("Utilizacao de IDENTIFICADOR - %s\n",$1)*/;if(!atualizaUso(&tabeladeSimbolos, (yyvsp[(1) - (1)].cadeia))){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",(yyvsp[(1) - (1)].cadeia));};}
+#line 101 "sintatico.y"
+    {
+        																		printf("\tUtilizacao de IDENTIFICADOR - %s\n",(yyvsp[(1) - (1)].cadeia));
+        																		if(!atualizaUso(&tabeladeSimbolos, (yyvsp[(1) - (1)].cadeia))){
+        																			erroSemantico++;printf("\tERRO: %s nao foi declarado\n",(yyvsp[(1) - (1)].cadeia));
+        																		}
+        																	;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 73 "sintatico.y"
-    {/*debug*//*printf("atrib expr atrib\n")*/;;}
+#line 107 "sintatico.y"
+    {
+        															printf("\tatrib expr atrib\n");
+        														;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1471 "sintatico.tab.c"
+#line 1507 "sintatico.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1679,7 +1715,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 76 "sintatico.y"
+#line 112 "sintatico.y"
 
 extern FILE *yyin;
 
@@ -1716,7 +1752,7 @@ int main (int argc, char*argv[]) {
 
 		erroSintatico = yyparse ();
 		emitRO("HALT",0,0,0,"");
-		
+
 		if(erroSintatico == 0)
 			printf("\tPrograma sintaticamente correto!\n");
 		//Verificiando se algum simbolo nao foi usado

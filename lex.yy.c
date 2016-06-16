@@ -670,7 +670,7 @@ YY_RULE_SETUP
 case 8:
 YY_RULE_SETUP
 #line 13 "lexico.l"
-{return NUMERO;}
+{yylval.val = atoi(yytext);return NUMERO;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP

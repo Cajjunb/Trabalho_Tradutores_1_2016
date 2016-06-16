@@ -8,9 +8,10 @@
 ("while")                    {return WHILE;}
 ("int")                    {return INT;}
 ("void")                    {return VOID;}
+("if")                    {return IF;}
 ("imprime")                    {return OUTPUT;}
 [a-zA-Z][a-zA-Z][0-9][0-9][0-9]	{yylval.cadeia=  strdup(yytext);return IDENTIFICADOR;}
-("+"|"-")?[0-9]+		{return NUMERO;}
+("+"|"-")?[0-9]+		{yylval.val = atoi(yytext);return NUMERO;}
 ("<<-")				{return ATRIB;}
 ("+"|"-"|"*"|"/")		{return OP;}
 ("!="|"=")			{ return REL;}

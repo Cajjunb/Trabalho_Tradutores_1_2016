@@ -2,6 +2,7 @@
 /* considerando notacao polonesa para expressoes */
 %{
 #include <stdio.h> 
+#include <stdlib.h> 
 #include <string.h> 
 #include "tabela.c"
 #include "globals.h"
@@ -10,14 +11,15 @@
 %}
 
 %union {
-char *cadeia;
-int val;
+	char *cadeia;
+	int  val;
 }
 
 %token INICIO
 %token FIM
 %token WHILE
-%token NUMERO
+%token  NUMERO
+%token  IF
 %token IDENTIFICADOR
 %token ATRIB
 %token REL
@@ -35,42 +37,77 @@ int val;
 /* Regras definindo a GLC e acoes correspondentes */
 /* neste nosso exemplo quase todas as acoes estao vazias */
 
-programa:	 declarationList INICIO statementlist FIM 			{;}
+programa:	 declarationList INICIO statementlist FIM 			{printf("\tFIM do parser\n");}
 ;
 
-declarationList: declarationList declaration | declaration 		{/*debug*//*printf("DeclarationList\n")*/;}
+declarationList: declarationList declaration | declaration 		{	
+																	printf("\tDeclarationList\n");
+																}
 ;
 
-declaration: typeSpecifier IDENTIFICADOR ';' 								{/*debug*//*printf("Declaracao de IDENTIFICADOR - %s\n",$2)*/;atualizaTabela( &tabeladeSimbolos, $2, 'd', "int");}
+declaration: typeSpecifier IDENTIFICADOR ';' 					{
+																	printf("\tDeclaracao de IDENTIFICADOR - %s\n",$2);
+																	atualizaTabela( &tabeladeSimbolos, $2, 'd', "int");}
 ;
 
-typeSpecifier: INT | VOID 										{/*debug*//*printf("tipo\n")*/;}
+typeSpecifier: INT | VOID 										{
+																	printf("\ttipo\n");
+																}
 ;
 
-statementlist:  statement										{/*debug*//*printf("statement\n")*/;}
-		| iterationStatement ';'								{/*debug*//*printf("iteration!\n")*/;}
-		| statementlist ';' statement							{/*debug*//*printf("statementlist\n")*/;}
+statementlist:  statement										{
+																	printf("\tstatement\n");
+																}
+		| iterationStatement ';'								{
+																	printf("\titeration!\n");
+																}
+		| statementlist ';' statement							{
+																	printf("\tstatementlist\n");
+																}
 ;
 
 iterationStatement: WHILE '(' expression ')' statement 			{;}
 
 ;
 
-statement:		IDENTIFICADOR ATRIB expression								{/*debug*//*printf("Utilizacao de IDENTIFICADOR %s\n", $1)*/;if(!atualizaUso(&tabeladeSimbolos, $1)){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);}}
-				| imprime										{;}
+statement:		IDENTIFICADOR ATRIB expression					{	
+																	printf("\tUtilizacao de IDENTIFICADOR %s\n", $1);
+																	if(!atualizaUso(&tabeladeSimbolos, $1)){
+																		erroSemantico++;
+																		printf("\tERRO: %s nao foi declarado\n",$1);
+																	}
+																}
+				| imprime										{
+																	printf("\tIMPRIME\n");
+																}
 ;
 
 imprime:	OUTPUT expression 											{emitRO("OUT",ac,0,0,"write ac");}
 
 ;
 
-expression:	expression REL aritexpression    					{/*debug*//*printf("expressionRELatritexpression")*/;}
-		| aritexpression										{/*debug*//*printf("atritexpression\n")*/;}
+expression:	expression REL aritexpression    					{
+																	printf("expressionRELatritexpression");
+																}
+		| aritexpression										{
+																	printf("\tatritexpression\n");
+																}
 ;
 
-aritexpression:     NUMERO 										{emitRM("LDC",ac,$0,0,"load const");/*debug*//*printf("Numero!\n")*/;}
-        | IDENTIFICADOR 													{/*debug*//*printf("Utilizacao de IDENTIFICADOR - %s\n",$1)*/;if(!atualizaUso(&tabeladeSimbolos, $1)){erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);}}
-        | aritexpression OP aritexpression 						{/*debug*//*printf("atrib expr atrib\n")*/;}
+aritexpression:     NUMERO 										{
+																	printf("\tNumero = %d \n",$1);
+																	emitRM("LDC",ac, $1,0,"load const");
+																	printf("\tNumero!\n");
+																}
+        | IDENTIFICADOR 													{
+        																		printf("\tUtilizacao de IDENTIFICADOR - %s\n",$1);
+        																		if(!atualizaUso(&tabeladeSimbolos, $1)){
+        																			erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);
+        																		}
+        																	}
+        | aritexpression OP aritexpression 						{
+        															printf("\tatrib expr atrib\n");
+        														}
 ;
 
 %%
