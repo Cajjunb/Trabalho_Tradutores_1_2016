@@ -8,7 +8,11 @@
 #include "globals.h"
 #include "code.h"
 
+/*Variaveis globais Nossas*/
+int  comandosCondicionais = 1;
+
 %}
+
 
 %union {
 	char *cadeia;
@@ -19,7 +23,9 @@
 %token FIM
 %token WHILE
 %token  NUMERO
-%token  IF
+%token  SE
+%token  OU
+%token FIMSE
 %token IDENTIFICADOR
 %token ATRIB
 %token REL
@@ -28,6 +34,7 @@
 %token INT
 %token VOID
 %token OUTPUT
+%token INPUT
 
 
 %type<cadeia> IDENTIFICADOR 
@@ -45,7 +52,8 @@ declarationList: declarationList declaration | declaration 		{
 																}
 ;
 
-declaration: typeSpecifier IDENTIFICADOR ';' 					{
+declaration: typeSpecifier IDENTIFICADOR ';' 					{	
+																	emitRM("LD",mp,6,ac,"load maxaddress from location 0");
 																	printf("\tDeclaracao de IDENTIFICADOR - %s\n",$2);
 																	atualizaTabela( &tabeladeSimbolos, $2, 'd', "int");}
 ;
@@ -58,15 +66,12 @@ typeSpecifier: INT | VOID 										{
 statementlist:  statement										{
 																	printf("\tstatement\n");
 																}
-		| iterationStatement ';'								{
-																	printf("\titeration!\n");
-																}
 		| statementlist ';' statement							{
 																	printf("\tstatementlist\n");
 																}
 ;
 
-iterationStatement: WHILE '(' expression ')' statement 			{;}
+iterationStatement: WHILE '(' expression ')' statement 'fimWhile'			{;}
 
 ;
 
@@ -80,14 +85,44 @@ statement:		IDENTIFICADOR ATRIB expression					{
 				| imprime										{
 																	printf("\tIMPRIME\n");
 																}
+				| selectionStatement							{
+																	printf("\t SELECTION STATEMENT\n");
+																}
+				| iterationStatement 							{
+																	printf("\titeration!\n");
+																}
+				| leitura										{
+																	;
+																}
 ;
 
-imprime:	OUTPUT expression 											{emitRO("OUT",ac,0,0,"write ac");}
+
+selectionStatement:  SE '(' expression ')' conditionalStatement {
+																	printf("\t Condicional SE \n"); printf("\tNumero de Linhas = %d\n",comandosCondicionais);
+																}
+					| SE '(' expression ')' conditionalStatement OU conditionalStatement 
+																{
+																	printf("\t Condicional SE e SENAO \n");
+																} 
+;
+
+conditionalStatement: statement									{
+																	printf("\tConditional Statement\n");
+																}
+;
+
+
+imprime:	OUTPUT expression 											{emitRO("OUT",ac,0,0,"write ac"); comandosCondicionais++ ; printf("\tNumero de Linhas = %d\n",comandosCondicionais);} 
 
 ;
+
+leitura:	INPUT identificador 										{emitRO("IN",ac,0,0,"write ac");comandosCondicionais++; printf("\tNumero de Linhas = %d\n",comandosCondicionais);}
+
+;
+
 
 expression:	expression REL aritexpression    					{
-																	printf("expressionRELatritexpression");
+																	printf("\texpressionRELatritexpression\n");
 																}
 		| aritexpression										{
 																	printf("\tatritexpression\n");
@@ -97,18 +132,25 @@ expression:	expression REL aritexpression    					{
 aritexpression:     NUMERO 										{
 																	printf("\tNumero = %d \n",$1);
 																	emitRM("LDC",ac, $1,0,"load const");
+																	comandosCondicionais++;
 																	printf("\tNumero!\n");
 																}
-        | IDENTIFICADOR 													{
-        																		printf("\tUtilizacao de IDENTIFICADOR - %s\n",$1);
-        																		if(!atualizaUso(&tabeladeSimbolos, $1)){
-        																			erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);
-        																		}
+        | identificador 													{
+        																		;
         																	}
         | aritexpression OP aritexpression 						{
         															printf("\tatrib expr atrib\n");
         														}
 ;
+
+
+identificador: IDENTIFICADOR 									{
+																	printf("\tUtilizacao de IDENTIFICADOR - %s\n",$1);
+																	if(!atualizaUso(&tabeladeSimbolos, $1)){
+																		erroSemantico++;printf("\tERRO: %s nao foi declarado\n",$1);
+																	};
+																}
+
 
 %%
 extern FILE *yyin;
@@ -149,6 +191,8 @@ int main (int argc, char*argv[]) {
 
 		if(erroSintatico == 0)
 			printf("\tPrograma sintaticamente correto!\n");
+		else
+			yyerror(erroSintatico);
 		//Verificiando se algum simbolo nao foi usado
 		verificaNaoUsado(&tabeladeSimbolos);
 
@@ -160,6 +204,6 @@ int main (int argc, char*argv[]) {
 }
 
 yyerror (s){
-	fprintf (stderr, "\t%s\n", s);
+	fprintf (stderr, "\tERRO = %s\n", s);
 }
 
